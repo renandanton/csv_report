@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Renan Danton"]
   spec.email         = ["renandanton@yahoo.com.br"]
 
-  spec.summary       = %q{CsvReport: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{CsvReport: Generate report for a csv file entry.}
-  spec.homepage      = ""
+  spec.summary       = %q{Generate a simple report in console.}
+  spec.description   = %q{Generate report for a csv file entry.}
+  spec.homepage      = "https://github.com/renandanton/csv_report"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -29,6 +29,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.4"
+  spec.add_development_dependency "rspec"
 
 end
