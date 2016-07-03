@@ -4,7 +4,6 @@ require "bytes_converter"
 require "csv"
 
 module CsvReport
-
   def self.report(*args)
     @file = args[0]
     @num_account = args[1]
@@ -15,7 +14,7 @@ module CsvReport
     @total_mins_fixed_phone_locals, @total_mins_fixed_phone_long_distants = 0, 0
     @total_sms, @total_internet = 0, 0
 
-    return "O caminho do arquivo .csv é obrigatório."if @file.nil?
+    return "O caminho do arquivo .csv é obrigatório." if @file.nil?
     return "O número da conta é obrigatório." if @num_account.nil?
 
     CSV.foreach(@file, @options) { |row|  @data << row if row['NumAcs'] == @num_account }
@@ -24,29 +23,38 @@ module CsvReport
 
     calculating_report
 
-    output_report
+    puts output_report
   end
 
   def self.calculating_report
     @data.select do |row|
-      @total_mins_cell_locals += ChronicDuration.parse(row['Duração']) if  Helpers::CALL_LOCAL_CELL.include?(row['Tpserv'])
-      @total_mins_cell_long_distants += ChronicDuration.parse(row['Duração']) if Helpers::CALL_DISTANTS_CELL.include?(row['Tpserv'])
-      @total_mins_fixed_phone_locals += ChronicDuration.parse(row['Duração']) if Helpers::CALL_LOCAL_FIXED_PHONE.include?(row['Tpserv'])
-      @total_mins_fixed_phone_long_distants += ChronicDuration.parse(row['Duração'])  if Helpers::CALL_DISTANTS_FIXED_PHONE.include?(row['Tpserv'])
+      @total_mins_cell_locals +=
+        ChronicDuration.parse(row['Duração']) if  Helpers::CALL_LOCAL_CELL.include?(row['Tpserv'])
+      @total_mins_cell_long_distants +=
+        ChronicDuration.parse(row['Duração']) if Helpers::CALL_DISTANTS_CELL.include?(row['Tpserv'])
+      @total_mins_fixed_phone_locals +=
+        ChronicDuration.parse(row['Duração']) if Helpers::CALL_LOCAL_FIXED_PHONE.include?(row['Tpserv'])
+      @total_mins_fixed_phone_long_distants +=
+        ChronicDuration.parse(row['Duração'])  if Helpers::CALL_DISTANTS_FIXED_PHONE.include?(row['Tpserv'])
       @total_internet += BytesConverter::convert(row['Duração']) if Helpers::INTERNET_TIM.include?(row['Tpserv'])
       @total_sms += 1 if Helpers::TORPEDOS_TIM.include?(row['Tpserv'])
     end
   end
 
   def self.output_report
-    puts "\n1. Ligações Locais:"
-    puts "\ta. Para Celulares: #{ChronicDuration.output(@total_mins_cell_locals, :keep_zero => true)}"
-    puts "\tb. Para Fixo: #{ChronicDuration.output(@total_mins_fixed_phone_locals, :keep_zero => true)}"
-    puts "\n2. Ligações de Longa Distância:"
-    puts "\ta. Para Celulaters: #{ChronicDuration.output(@total_mins_cell_long_distants, :keep_zero => true)}"
-    puts "\tb. Para Fixo: #{ChronicDuration.output(@total_mins_fixed_phone_long_distants, :keep_zero => true)}"
-    puts "\n3. SMS (unidades): #{@total_sms}"
-    puts "4. Internet (bytes): #{@total_internet}"
+    total_call_locals = (@total_mins_cell_locals  +  @total_mins_fixed_phone_locals)
+    total_call_distants = (@total_mins_cell_long_distants + @total_mins_fixed_phone_long_distants)
+
+    output =  "\n1. Ligações Locais: #{ChronicDuration.output(total_call_locals, :keep_zero => true)}"
+    output << "\n\ta. Para Celulares: #{ChronicDuration.output(@total_mins_cell_locals, :keep_zero => true)}"
+    output << "\n\tb. Para Fixo: #{ChronicDuration.output(@total_mins_fixed_phone_locals, :keep_zero => true)}"
+    output << "\n2. Ligações de Longa Distância: #{ChronicDuration.output(total_call_distants, :keep_zero => true)}"
+    output << "\n\ta. Para Celulares: #{ChronicDuration.output(@total_mins_cell_long_distants, :keep_zero => true)}"
+    output << "\n\tb. Para Fixo: #{ChronicDuration.output(@total_mins_fixed_phone_long_distants, :keep_zero => true)}"
+    output << "\n3. SMS (unidades): #{@total_sms}"
+    output << "\n4. Internet (bytes): #{@total_internet}"
+
+    output
   end
 end
 
@@ -59,4 +67,3 @@ module Helpers
   INTERNET_TIM = ['TIM Wap Fast','TIM Connect Fast']
   SERVICES = ['Serviços de SMS', 'Serviços de Sons', 'Serviços de Jogos', 'Serviços VAS']
 end
-
