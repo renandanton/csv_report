@@ -19,11 +19,12 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "chronic_duration"
-  spec.add_dependency "bytes_converter"
+  spec.required_ruby_version = '>= 2.1.8'
+
+  spec.add_dependency "chronic_duration", "~> 0.10.6"
+  spec.add_dependency "bytes_converter",  "~> 0.0.5"
 
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec"
-
+  spec.add_development_dependency "rspec", "~> 3.5"
 end
