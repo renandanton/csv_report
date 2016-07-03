@@ -11,6 +11,10 @@ module CsvReport
     @data = Array.new
     @options = {:headers => true, :col_sep => ';'}
 
+    @total_mins_cell_locals, @total_mins_cell_long_distants  = 0, 0
+    @total_mins_fixed_phone_locals, @total_mins_fixed_phone_long_distants = 0, 0
+    @total_sms, @total_internet = 0, 0
+
     return "O caminho do arquivo .csv é obrigatório."if @file.nil?
     return "O número da conta é obrigatório." if @num_account.nil?
 
@@ -18,10 +22,12 @@ module CsvReport
 
     return "Não foi encontrado registros com o numero #{@num_account}." if @data.count < 1
 
-    @total_mins_cell_locals, @total_mins_cell_long_distants  = 0, 0
-    @total_mins_fixed_phone_locals, @total_mins_fixed_phone_long_distants = 0, 0
-    @total_sms, @total_internet = 0, 0
+    calculating_report
 
+    output_report
+  end
+
+  def self.calculating_report
     @data.select do |row|
       @total_mins_cell_locals += ChronicDuration.parse(row['Duração']) if  Helpers::CALL_LOCAL_CELL.include?(row['Tpserv'])
       @total_mins_cell_long_distants += ChronicDuration.parse(row['Duração']) if Helpers::CALL_DISTANTS_CELL.include?(row['Tpserv'])
@@ -30,8 +36,6 @@ module CsvReport
       @total_internet += BytesConverter::convert(row['Duração']) if Helpers::INTERNET_TIM.include?(row['Tpserv'])
       @total_sms += 1 if Helpers::TORPEDOS_TIM.include?(row['Tpserv'])
     end
-
-    output_report
   end
 
   def self.output_report
