@@ -17,7 +17,11 @@ module CsvReport
     return "O caminho do arquivo .csv é obrigatório." if @file.nil?
     return "O número da conta é obrigatório." if @num_account.nil?
 
-    CSV.foreach(@file, @options) { |row|  @data << row if row['NumAcs'] == @num_account }
+    begin
+      CSV.foreach(@file, @options) { |row|  @data << row if row['NumAcs'] == @num_account }
+    rescue
+      return "Não foi possível ler o arquivo no diretório #{@file}."
+    end
 
     return "Não foi encontrado registros com o numero #{@num_account}." if @data.count < 1
 
